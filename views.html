@@ -38,7 +38,7 @@
     <script>
       window.addEventListener("load", async () => {
         try {
-          const res = await fetch("http://localhost:5000");
+          const res = await fetch("https://information-form-2.onrender.com");
           const data = await res.json();
 
           data.forEach((item) => {
@@ -85,7 +85,7 @@
               }).then(async (result) => {
                 if (result.isConfirmed) {
                   try {
-                    const res = await fetch(`http://localhost:5000/delete/${id}`, {
+                    const res = await fetch(`https://information-form-2.onrender.com/delete/${id}`, {
                       method: "delete",
                       headers: { "Content-type": "application/json" }
                     });

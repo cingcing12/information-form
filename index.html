@@ -131,7 +131,7 @@
           const first_name = e.target.querySelector("#first_name").value;
           const last_name = e.target.querySelector("#last_name").value;
           const age = e.target.querySelector("#age").value;
-          const res = await fetch(`http://localhost:5000/postData`, {
+          const res = await fetch(`https://information-form-2.onrender.com/postData`, {
             method: "POST",
             headers: { "Content-type": "application/json" },
             body: JSON.stringify({ first_name, last_name, age }),
