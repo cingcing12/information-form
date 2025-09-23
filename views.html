@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  </head>
+  <body>
+    <div class="containerTable table-responsive">
+      <div class="container">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>First name</th>
+              <th>Last name</th>
+              <th>Age</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      window.addEventListener("load", async () => {
+        try {
+          const res = await fetch("http://localhost:5000");
+          const data = await res.json();
+
+          data.forEach((item) => {
+            const tr = document.createElement("tr");
+            tr.dataset.id = item._id;
+            tr.classList.add("containerItem");
+
+            const fname = document.createElement("td");
+            fname.classList.add("Fname");
+            fname.textContent = item.first_name;
+            tr.appendChild(fname);
+
+            const lname = document.createElement("td");
+            lname.classList.add("lname");
+            lname.textContent = item.last_name;
+            tr.appendChild(lname);
+
+            const age = document.createElement("td");
+            age.classList.add("age");
+            age.textContent = item.age;
+            tr.appendChild(age);
+
+            const containerAction = document.createElement("td");
+            containerAction.classList.add("containerAction");
+            containerAction.innerHTML = `
+                    <button class="btn btn-primary edit">Edit</button>
+                    <button class="btn btn-danger remove">Delete</button>
+                    `;
+            tr.appendChild(containerAction);
+
+            document.querySelector("tbody").appendChild(tr);
+
+            const id = tr.dataset.id;
+
+            tr.querySelector(".remove").addEventListener("click", () => {
+              Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!",
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  try {
+                    const res = await fetch(`http://localhost:5000/delete/${id}`, {
+                      method: "delete",
+                      headers: { "Content-type": "application/json" }
+                    });
+                    const message = await res.json();
+                    if (res.ok) {
+                      Swal.fire({
+                        title: "Deleted!",
+                        text: message,
+                        icon: "success",
+                      }).then(() => tr.remove());
+                    } else {
+                      Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: message,
+                      });
+                    }
+                  } catch (err) {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Oops...",
+                      text: err.message,
+                    });
+                  }
+                }
+              });
+            });
+          });
+        } catch (err) {
+          Swal.fire({
+                      icon: "error",
+                      title: "Oops...",
+                      text: err.message,
+                    });
+        }
+      });
+    </script>
+  </body>
+</html>
