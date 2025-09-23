@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Information - Form</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -37,8 +38,7 @@
   </head>
   <body data-bs-theme="dark">
     <div class="container">
-        Edit Successfully!
-        <form method="post" action="http://localhost:3000/postData">
+        <form>
             <h2 class="h2 mb-4">✏ Information Form</h2>
             <div class="row">
           <div class="col-lg-6 col-12 mb-4">
@@ -48,6 +48,7 @@
             required
             placeholder="first_name"
             class="form-control"
+            id="first_name"
           />
           </div>
           <div class="col-lg-6 col-12 mb-4">
@@ -57,6 +58,7 @@
             required
             placeholder="last_name"
             class="form-control"
+            id="last_name"
           />
           </div>
           
@@ -67,6 +69,7 @@
             required
             placeholder="age"
             class="form-control"
+            id="age"
           />
           </div>
           
@@ -76,5 +79,44 @@
         </div>
         </form>
     </div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try{
+                const first_name = e.target.querySelector('#first_name').value;
+                const last_name = e.target.querySelector('#last_name').value;
+                const age = e.target.querySelector('#age').value;
+                const res = await fetch(`http://localhost:5000/postData`, {
+                    method: "POST",
+                    headers: {"Content-type": "application/json"},
+                    body: JSON.stringify({first_name, last_name, age})
+                })
+                const message = await res.json();
+                if(res.ok){
+                    Swal.fire({
+                        title: "Successfully!",
+                        text: message.mess,
+                        icon: "success",
+                      })
+                      .then(() => {
+                        e.target.reset();
+                      })
+                }else{
+                    Swal.fire({
+                      icon: "error",
+                      title: "Oops...",
+                      text: message.err,
+                    });
+                }
+            }catch(err){
+                Swal.fire({
+                      icon: "error",
+                      title: "Oops...",
+                      text: err.message,
+                    });
+            }
+        })
+    </script>
   </body>
 </html>
