@@ -16,8 +16,15 @@
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
       crossorigin="anonymous"
     ></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
 
+    <script
+      src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.1/dist/dotlottie-wc.js"
+      type="module"
+    ></script>
     <style>
       body {
         display: flex;
@@ -26,7 +33,7 @@
         min-height: 100vh;
       }
 
-      .container{
+      .container {
         max-width: 600px;
         width: 100%;
         border: 1px solid white;
@@ -34,89 +41,134 @@
         border-radius: 20px;
         margin-inline: 40px;
       }
+
+      .loading{
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        transition: opacity 2s, visibility 2s;
+
+
+        &::after{
+            position: absolute;
+            content: '';
+            width: 100%;
+            height: 100%;
+            inset: 0;
+            background-color: black;
+            z-index: -1;
+            opacity: 0.75;
+        }
+      }
+
+      .loading.hidden{
+        opacity: 0;
+        visibility: hidden;
+      }
     </style>
   </head>
   <body data-bs-theme="dark">
+    <div class="loading hidden">
+      <dotlottie-wc
+        src="https://lottie.host/95dbfb89-574f-402c-8eee-ed37726ce6b9/GaBtD93fyj.lottie"
+        style="width: 300px; height: 300px"
+        autoplay
+        loop
+      ></dotlottie-wc>
+    </div>
+
     <div class="container">
-        <form>
-            <h2 class="h2 mb-4">✏ Information Form</h2>
-            <div class="row">
+      <form>
+        <h2 class="h2 mb-4">✏ Information Form</h2>
+        <div class="row">
           <div class="col-lg-6 col-12 mb-4">
             <input
-            type="text"
-            name="first_name"
-            required
-            placeholder="first_name"
-            class="form-control"
-            id="first_name"
-          />
+              type="text"
+              name="first_name"
+              required
+              placeholder="first_name"
+              class="form-control"
+              id="first_name"
+            />
           </div>
           <div class="col-lg-6 col-12 mb-4">
             <input
-            type="text"
-            name="last_name"
-            required
-            placeholder="last_name"
-            class="form-control"
-            id="last_name"
-          />
+              type="text"
+              name="last_name"
+              required
+              placeholder="last_name"
+              class="form-control"
+              id="last_name"
+            />
           </div>
-          
+
           <div class="col-lg-6 col-12 mb-4">
             <input
-            type="number"
-            name="age"
-            required
-            placeholder="age"
-            class="form-control"
-            id="age"
-          />
+              type="number"
+              name="age"
+              required
+              placeholder="age"
+              class="form-control"
+              id="age"
+            />
           </div>
-          
+
           <div class="col-12 justify-content-end d-flex">
             <button type="submit" class="btn btn-primary">Submit</button>
           </div>
         </div>
-        </form>
+      </form>
     </div>
 
     <script>
-        document.querySelector('form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            try{
-                const first_name = e.target.querySelector('#first_name').value;
-                const last_name = e.target.querySelector('#last_name').value;
-                const age = e.target.querySelector('#age').value;
-                const res = await fetch(`http://localhost:5000/postData`, {
-                    method: "POST",
-                    headers: {"Content-type": "application/json"},
-                    body: JSON.stringify({first_name, last_name, age})
-                })
-                const message = await res.json();
-                if(res.ok){
-                    Swal.fire({
-                        title: "Successfully!",
-                        text: message.mess,
-                        icon: "success",
-                      })
-                      .then(() => {
-                        e.target.reset();
-                      })
-                }else{
-                    Swal.fire({
-                      icon: "error",
-                      title: "Oops...",
-                      text: message.err,
-                    });
-                }
-            }catch(err){
-                Swal.fire({
-                      icon: "error",
-                      title: "Oops...",
-                      text: err.message,
-                    });
-            }
+      document.querySelector("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        try {
+          const first_name = e.target.querySelector("#first_name").value;
+          const last_name = e.target.querySelector("#last_name").value;
+          const age = e.target.querySelector("#age").value;
+          const res = await fetch(`http://localhost:5000/postData`, {
+            method: "POST",
+            headers: { "Content-type": "application/json" },
+            body: JSON.stringify({ first_name, last_name, age }),
+          });
+          const message = await res.json();
+          if (res.ok) {
+            Swal.fire({
+              title: "Successfully!",
+              text: message.mess,
+              icon: "success",
+            }).then(() => {
+              e.target.reset();
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: message.err,
+            });
+          }
+        } catch (err) {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: err.message,
+          });
+        }
+      });
+
+      window.addEventListener("load", () => {
+        const loading = document.querySelector('.loading');
+        loading.classList.remove('hidden');
+
+        document.addEventListener("transitionend", () => {
+            loading.classList.add('hidden');
         })
+      })
     </script>
   </body>
 </html>
