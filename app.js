@@ -2,14 +2,16 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const bodyParser = require('body-parser');
-const port = 5000;
+require('dotenv').config(); // Load .env file
+
+const PORT = process.env.PORT || 5000;
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 // Middleware to parse URL-encoded form data
 app.use(bodyParser.urlencoded({ extended: true }));
-const Url = "mongodb+srv://cing16339:1234@db-eccomerce.qts16aa.mongodb.net/?retryWrites=true&w=majority&appName=DB-eccomerce";
+const Url = process.env.MONGODB_URL;
 
 const itemSchema = new mongoose.Schema({
     first_name: String,
@@ -58,8 +60,30 @@ mongoose.connect(Url)
         }
     })
 
-    app.listen(port, () => {
-        console.log(`Server is running: http://localhost:${port}`);
+
+    app.put("/update/:id", async (req, res) => {
+        try{
+            const {id} = req.params;
+            const {first_name, last_name, ageEdite} = req.body;
+            const dataUpdate = await item.findByIdAndUpdate(id, {
+                first_name: first_name, last_name: last_name, age: ageEdite
+            }, 
+            {new: true});
+
+            if(dataUpdate){
+                res.status(200).json({item: dataUpdate, message: "Update Successfully!"});
+                console.log(item.findById(id));
+                console.log(first_name, last_name, ageEdite)
+            }else{
+                res.status(404).json("Not Found!");
+            }
+        }catch(err){
+            res.status(500).json({err: err.message});
+        }
+    })
+
+    app.listen(PORT, () => {
+        console.log(`Server is running: http://localhost:${PORT}`);
     })
 
 

@@ -16,9 +16,53 @@
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
       crossorigin="anonymous"
     ></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+
+    <style>
+      .container.containerEdit {
+        max-width: 600px;
+        width: 100%;
+        border: 1px solid white;
+        padding: 40px;
+        border-radius: 20px;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) translateY(-50px);
+        transition: 0.5s ease;
+        opacity: 0;
+        visibility: hidden;
+        z-index: 100;
+      }
+
+      .container.containerEdit.active {
+        transform: translate(-50%, -50%) translateY(0px);
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .overlay {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        z-index: 99;
+        inset: 0;
+        background-color: black;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.5s ease;
+      }
+
+      .overlay.active {
+        opacity: 0.75;
+        visibility: visible;
+      }
+    </style>
   </head>
-  <body>
+  <body data-bs-theme="dark">
     <div class="containerTable table-responsive">
       <div class="container">
         <table class="table table-hover">
@@ -35,11 +79,61 @@
       </div>
     </div>
 
+    <div class="overlay"></div>
+
+    <div class="container containerEdit">
+      <form>
+        <h2 class="h2 mb-4">✏ Information Form Edit</h2>
+        <div class="row">
+          <div class="col-lg-6 col-12 mb-4">
+            <input
+              type="text"
+              name="first_name"
+              required
+              placeholder="first_name"
+              class="form-control"
+              id="first_name"
+            />
+          </div>
+          <div class="col-lg-6 col-12 mb-4">
+            <input
+              type="text"
+              name="last_name"
+              required
+              placeholder="last_name"
+              class="form-control"
+              id="last_name"
+            />
+          </div>
+
+          <div class="col-lg-6 col-12 mb-4">
+            <input
+              type="number"
+              name="age"
+              required
+              placeholder="age"
+              class="form-control"
+              id="age"
+            />
+          </div>
+
+          <div class="col-12 justify-content-end d-flex">
+            <button type="submit" class="btn btn-primary">Confirm</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
     <script>
       window.addEventListener("load", async () => {
         try {
           const res = await fetch("https://information-form-2.onrender.com");
           const data = await res.json();
+          let dataId = null;
+          const containerEdit = document.querySelector(
+              ".container.containerEdit"
+            );
+            const overlay = document.querySelector(".overlay");
 
           data.forEach((item) => {
             const tr = document.createElement("tr");
@@ -85,10 +179,13 @@
               }).then(async (result) => {
                 if (result.isConfirmed) {
                   try {
-                    const res = await fetch(`https://information-form-2.onrender.com/delete/${id}`, {
-                      method: "delete",
-                      headers: { "Content-type": "application/json" }
-                    });
+                    const res = await fetch(
+                      `https://information-form-2.onrender.com/delete/${id}`,
+                      {
+                        method: "delete",
+                        headers: { "Content-type": "application/json" },
+                      }
+                    );
                     const message = await res.json();
                     if (res.ok) {
                       Swal.fire({
@@ -113,15 +210,97 @@
                 }
               });
             });
+
+            
+
+            tr.querySelector(".edit").addEventListener("click", () => {
+              containerEdit.classList.add("active");
+              overlay.classList.add("active");
+
+              let fnameEdit = document.querySelector("#first_name");
+              let lnameEdit = document.querySelector("#last_name");
+              let editAge = document.querySelector("#age");
+
+              fnameEdit.value = fname.textContent;
+              lnameEdit.value = lname.textContent;
+              editAge.value = age.textContent;
+              dataId = id;
+              overlay.addEventListener("click", () => {
+                containerEdit.classList.remove("active");
+                overlay.classList.remove("active");
+
+                document.querySelector("form").reset();
+              });
+
+              
+            });
           });
-        } catch (err) {
-          Swal.fire({
+
+           document
+                .querySelector("form")
+                .addEventListener("submit", async (e) => {
+                  e.preventDefault();
+
+                  const first_name = document.querySelector("#first_name").value;
+                  const last_name = document.querySelector("#last_name").value;
+                  const ageEdite = document.querySelector("#age").value;
+
+                  try {
+                    const res = await fetch(
+                      `https://information-form-2.onrender.com/update/${dataId}`,
+                      {
+                        method: "PUT",
+                        headers: { "Content-type": "application/json" },
+                        body: JSON.stringify({
+                          first_name,
+                          last_name,
+                          ageEdite,
+                        }),
+                      }
+                    );
+
+                    const message = await res.json();
+
+                    if (res.ok) {
+                      Swal.fire({
+                        title: "Update!",
+                        text: message.message,
+                        icon: "success",
+                      }).then(() => {
+                        containerEdit.classList.remove("active");
+                        overlay.classList.remove("active");
+                        document.querySelector("form").reset();
+                        const tr = document.querySelector(`tr[data-id="${dataId}"]`);
+                        tr.querySelector(".Fname").textContent = first_name;
+                        tr.querySelector('.lname').textContent = last_name;
+                        tr.querySelector('.age').textContent = ageEdite;
+
+                      });
+                    } else {
+                      Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: message,
+                      });
+                    }
+                  } catch (err) {
+                    Swal.fire({
                       icon: "error",
                       title: "Oops...",
                       text: err.message,
                     });
+                  }
+                });
+        } catch (err) {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: err.message,
+          });
         }
       });
+
+     
     </script>
   </body>
 </html>
