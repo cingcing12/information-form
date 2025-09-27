@@ -82,6 +82,27 @@ mongoose.connect(Url)
         }
     })
 
+    app.post('/login', async (req, res) => {
+        try{
+            const {email, password} = req.body;
+            if(email === "vongsokpheak@gmail.com" && password === "XfightGG@@"){
+                res.status(200).json("Login Successfully!");
+            }else{
+                res.status(404).json({err: "Invalid email or password."});
+            }
+        }catch(err){
+            res.status(500).json({err: err.message});
+        }
+    })
+
+    app.post("/logout", async (req, res) => {
+        try{
+            res.status(200).json("Logout successfully!");
+        }catch(err){
+            res.status(500).json({err: err.message});
+        }
+    })
+
     app.listen(PORT, () => {
         console.log(`Server is running: http://localhost:${PORT}`);
     })
