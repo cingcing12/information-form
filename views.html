@@ -139,7 +139,7 @@
         const table = document.querySelector('table');
         table.classList.toggle('hidden', !checkLogin);
         if(!checkLogin){
-          window.location.href = "/login.html";
+          window.location.href = "https://cingcing12.github.io/information-form/login.html";
         }
         try {
           const res = await fetch("https://information-form-2.onrender.com");
@@ -339,11 +339,10 @@
                       })
                       .then(() => {
                         localStorage.removeItem("checkLogin");
-                        window.location.href = "/index.html";
+                        window.location.href = "https://cingcing12.github.io/information-form/index.html";
                       })
                     }
                   })
-                  
                 }
               });
           }catch(err){
