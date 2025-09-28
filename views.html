@@ -64,16 +64,74 @@
       table.hidden{
         display: none;
       }
+
+      .containerAdmin{
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50px);
+        text-align: center;
+        background-color: black;
+        border-radius: 5px;
+        padding: 20px;
+        text-wrap: nowrap;
+        font-weight: bold;
+        opacity: 0;
+        visibility: hidden;
+        animation: adminAnima 0.50s linear forwards;
+      }
+
+      @keyframes adminAnima{
+        to{
+          transform: translateX(-50%) translateY(0px);
+          opacity: 1;
+          visibility: visible;
+        }
+      }
+
+      .containerAdmin.hidden{
+        background-color: red;
+        animation: hiddenAmin 0.50s linear forwards;
+      }
+
+      @keyframes hiddenAmin{
+        to{
+          transform: translateX(-50%) translateY(-50px);
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
+
     </style>
   </head>
   <body data-bs-theme="dark">
 
-    <div class="container d-flex justify-content-end my-4">
-      <button class="btn btn-danger logout">Logout</button>
-    </div>
+    <nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+      <a href="index.html" class="nav-brand nav-link fs-2"><i class="bi bi-person-lines-fill"></i></a>
+      <button class="navbar-toggler" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions"><span class="navbar-toggler-icon"></span></button>
 
-    <div class="containerTable table-responsive">
+      <div class="offcanvas offcanvas-start" id="offcanvasWithBothOptions">
+        <div class="offcanvas-header">
+          <a href="index.html" class="nav-brand nav-link fs-2 offcanvas-title"><i class="bi bi-person-lines-fill"></i></a>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="justify-content-end flex-grow-1 navbar-nav gap-2">
+            <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-item"><a href="views.html" class="nav-link">Admin</a></li>
+            <li class="nav-item"><button class="btn btn-outline-danger logout d-flex align-items-center gap-1"><i class="bi bi-box-arrow-right"></i> Logout</button></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="containerAdmin"></div>
+
+    <div class="containerTable table-responsive my-4">
       <div class="container">
+        <h2 class="fs-2 mb-4">Information Table</h2>
         <table class="table table-hover">
           <thead>
             <tr>
@@ -135,10 +193,10 @@
 
     <script>
       window.addEventListener("load", async () => {
-        const checkLogin = localStorage.getItem("checkLogin");
+        const checkLogin = JSON.parse(localStorage.getItem("checkLogin")) || [];
         const table = document.querySelector('table');
-        table.classList.toggle('hidden', !checkLogin);
-        if(!checkLogin){
+        table.classList.toggle('hidden', !checkLogin.login);
+        if(!checkLogin.login){
           window.location.href = "https://cingcing12.github.io/information-form/login.html";
         }
         try {
@@ -149,6 +207,13 @@
               ".container.containerEdit"
             );
             const overlay = document.querySelector(".overlay");
+
+            const containerAdmin = document.querySelector('.containerAdmin')
+            containerAdmin.innerHTML = `Welcome admin: ${checkLogin.emailAdmin}`;
+
+            setTimeout(() => {
+              containerAdmin.classList.add('hidden')
+            }, 2000)
 
           data.forEach((item) => {
             const tr = document.createElement("tr");
@@ -173,8 +238,8 @@
             const containerAction = document.createElement("td");
             containerAction.classList.add("containerAction");
             containerAction.innerHTML = `
-                    <button class="btn btn-primary edit">Edit</button>
-                    <button class="btn btn-danger remove">Delete</button>
+                    <button class="btn btn-outline-primary edit"><i class="bi bi-pencil-square"></i> Edit</button>
+                    <button class="btn btn-outline-danger remove"><i class="bi bi-trash-fill"></i> Delete</button>
                     `;
             tr.appendChild(containerAction);
 

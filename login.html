@@ -63,7 +63,8 @@
           <label for="floatingPassword">Password</label>
         </div>
 
-        <div class="d-flex justify-content-end">
+        <div class="d-flex justify-content-between align-items-center">
+          <a href="index.html">Back to home</a>
           <button type="submit" class="btn btn-primary mt-3">Login</button>
         </div>
       </form>
@@ -88,7 +89,7 @@
               text: message,
               icon: "success",
             }).then(() => {
-              localStorage.setItem("checkLogin", true);
+              localStorage.setItem("checkLogin", JSON.stringify({login: true, emailAdmin: email, passwordAdmin: password}));
               window.location.href = "https://cingcing12.github.io/information-form/views.html";
             });
           } else {
